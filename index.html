@@ -3,7 +3,12 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Отель Аляска — отзывы</title>
+    <title>Отель Горизонт — отзывы</title>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    
     <style>
         * {
             margin: 0;
@@ -13,77 +18,81 @@
 
         body {
             font-family: 'Segoe UI', 'Helvetica Neue', system-ui, sans-serif;
-            background: #eef2f5;
-            color: #1a2c3a;
+            background: linear-gradient(145deg, #dce6ed 0%, #eef4f8 100%);
+            color: #162b38;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 30px 18px;
+            padding: 40px 20px;
         }
 
         .container {
-            max-width: 740px;
+            max-width: 760px;
             width: 100%;
-            background: #ffffff;
-            border-radius: 32px;
-            box-shadow: 0 30px 60px -15px rgba(0, 20, 30, 0.12);
-            padding: 50px 44px 44px;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(6px);
+            border-radius: 40px;
+            box-shadow: 0 40px 80px -20px rgba(10, 40, 60, 0.20);
+            padding: 52px 48px 44px;
+            border: 1px solid rgba(255, 255, 255, 0.6);
         }
 
         .header {
-            border-bottom: 2px solid #e4eaef;
-            padding-bottom: 22px;
-            margin-bottom: 34px;
+            border-bottom: 2px solid #dce6ed;
+            padding-bottom: 24px;
+            margin-bottom: 32px;
             display: flex;
             justify-content: space-between;
             align-items: flex-end;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 12px;
         }
 
         .hotel-name {
-            font-size: 34px;
-            font-weight: 300;
-            letter-spacing: 2.5px;
-            color: #0a1a24;
-            line-height: 1.05;
+            font-size: 38px;
+            font-weight: 200;
+            letter-spacing: 4px;
+            color: #0a202e;
         }
 
         .hotel-name span {
             font-weight: 600;
-            color: #1f6a8a;
+            color: #1e6d8f;
+            letter-spacing: 2px;
         }
 
         .hotel-sub {
             font-size: 13px;
             font-weight: 500;
-            color: #5f7d92;
-            letter-spacing: 1px;
+            color: #4c738a;
             text-transform: uppercase;
-            background: #eaf0f5;
-            padding: 7px 18px;
-            border-radius: 40px;
+            letter-spacing: 1.2px;
+            background: rgba(30, 109, 143, 0.08);
+            padding: 6px 20px;
+            border-radius: 60px;
+            border: 1px solid rgba(30, 109, 143, 0.12);
         }
 
         .invite {
-            font-size: 18px;
-            line-height: 1.6;
-            color: #1f3b4b;
-            margin-bottom: 34px;
-            padding: 18px 24px;
-            background: #f6f9fb;
-            border-radius: 18px;
-            border-left: 5px solid #1f6a8a;
+            font-size: 19px;
+            line-height: 1.7;
+            color: #1a3b4e;
+            margin-bottom: 36px;
+            padding: 20px 28px;
+            background: rgba(220, 230, 237, 0.4);
+            border-radius: 24px;
+            border-left: 6px solid #1e6d8f;
+            font-weight: 400;
         }
 
         .invite strong {
             font-weight: 600;
-            color: #0a1a24;
+            color: #0a202e;
         }
 
         .form-group {
-            margin-bottom: 24px;
+            margin-bottom: 26px;
         }
 
         .form-group label {
@@ -91,31 +100,30 @@
             font-size: 13px;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.6px;
-            color: #36586d;
-            margin-bottom: 6px;
+            letter-spacing: 0.8px;
+            color: #2a556b;
+            margin-bottom: 7px;
         }
 
         .form-group input,
-        .form-group textarea,
-        .form-group select {
+        .form-group textarea {
             width: 100%;
-            padding: 15px 20px;
+            padding: 16px 22px;
             font-size: 16px;
             font-family: inherit;
-            background: #f6f9fb;
-            border: 1.5px solid #dae3ea;
-            border-radius: 16px;
-            color: #1a2c3a;
-            transition: 0.2s;
+            background: #f6fafd;
+            border: 1.5px solid #d4e0e8;
+            border-radius: 18px;
+            color: #162b38;
+            transition: 0.25s;
             outline: none;
         }
 
         .form-group input:focus,
         .form-group textarea:focus {
-            border-color: #1f6a8a;
+            border-color: #1e6d8f;
             background: #ffffff;
-            box-shadow: 0 0 0 5px rgba(31, 106, 138, 0.07);
+            box-shadow: 0 0 0 6px rgba(30, 109, 143, 0.06);
         }
 
         .form-group textarea {
@@ -125,13 +133,13 @@
 
         .rating-group {
             display: flex;
-            gap: 10px;
+            gap: 12px;
             flex-wrap: wrap;
             margin-top: 4px;
         }
 
         .rating-option {
-            flex: 1 0 50px;
+            flex: 1 0 52px;
             text-align: center;
         }
 
@@ -141,85 +149,91 @@
 
         .rating-option label {
             display: block;
-            padding: 10px 0;
-            background: #eef4f8;
-            border-radius: 14px;
+            padding: 12px 0;
+            background: #eef5f9;
+            border-radius: 16px;
             font-weight: 600;
-            font-size: 18px;
-            color: #36586d;
+            font-size: 20px;
+            color: #2a556b;
             cursor: pointer;
-            transition: 0.15s;
+            transition: 0.2s;
             border: 2px solid transparent;
         }
 
         .rating-option input:checked + label {
-            background: #dce8f0;
-            border-color: #1f6a8a;
-            color: #0a1a24;
-            box-shadow: 0 4px 14px rgba(31, 106, 138, 0.1);
+            background: #d4e7f0;
+            border-color: #1e6d8f;
+            color: #0a202e;
+            box-shadow: 0 6px 18px rgba(30, 109, 143, 0.08);
         }
 
         .rating-option label:hover {
-            background: #e2eaf1;
+            background: #dce8f0;
         }
 
         .btn-submit {
             width: 100%;
-            padding: 17px;
-            background: #1a3848;
+            padding: 18px;
+            background: #1a3e52;
             border: none;
-            border-radius: 40px;
-            font-size: 18px;
+            border-radius: 50px;
+            font-size: 19px;
             font-weight: 600;
             color: white;
-            letter-spacing: 0.8px;
+            letter-spacing: 1px;
             cursor: pointer;
-            transition: 0.2s;
-            margin-top: 6px;
-            box-shadow: 0 8px 20px rgba(26, 56, 72, 0.15);
+            transition: 0.25s;
+            margin-top: 8px;
+            box-shadow: 0 10px 28px rgba(26, 62, 82, 0.18);
         }
 
         .btn-submit:hover {
-            background: #091a24;
+            background: #08212e;
             transform: scale(1.01);
-            box-shadow: 0 12px 28px rgba(26, 56, 72, 0.22);
+            box-shadow: 0 14px 34px rgba(26, 62, 82, 0.26);
         }
 
         .btn-submit:active {
             transform: scale(0.96);
         }
 
+        .btn-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
         .reviews-section {
-            margin-top: 48px;
-            padding-top: 34px;
-            border-top: 2px solid #e4eaef;
+            margin-top: 50px;
+            padding-top: 36px;
+            border-top: 2px solid #dce6ed;
         }
 
         .reviews-title {
-            font-size: 20px;
-            font-weight: 400;
-            color: #1a2c3a;
-            margin-bottom: 22px;
-            letter-spacing: 0.3px;
+            font-size: 22px;
+            font-weight: 300;
+            color: #162b38;
+            margin-bottom: 24px;
+            letter-spacing: 0.5px;
         }
 
         .reviews-title span {
             font-weight: 600;
-            color: #1f6a8a;
+            color: #1e6d8f;
         }
 
         .review-card {
-            background: #f6f9fb;
-            border-radius: 20px;
-            padding: 22px 26px;
-            margin-bottom: 16px;
-            border: 1px solid #e4eaef;
-            transition: 0.15s;
+            background: #f6fafd;
+            border-radius: 22px;
+            padding: 24px 28px;
+            margin-bottom: 18px;
+            border: 1px solid #dce6ed;
+            transition: 0.2s;
         }
 
         .review-card:hover {
             border-color: #b8cedb;
-            background: #fafcfd;
+            background: #fafdfe;
         }
 
         .review-header {
@@ -227,59 +241,85 @@
             justify-content: space-between;
             align-items: baseline;
             flex-wrap: wrap;
-            gap: 6px 14px;
-            margin-bottom: 8px;
+            gap: 8px 16px;
+            margin-bottom: 10px;
         }
 
         .review-author {
             font-weight: 600;
-            font-size: 17px;
-            color: #0a1a24;
+            font-size: 18px;
+            color: #0a202e;
         }
 
         .review-rating {
-            font-size: 15px;
+            font-size: 16px;
             font-weight: 500;
-            color: #36586d;
-            background: #e4eaef;
-            padding: 2px 16px;
-            border-radius: 40px;
-            letter-spacing: 0.2px;
+            color: #2a556b;
+            background: #dce6ed;
+            padding: 2px 18px;
+            border-radius: 60px;
         }
 
         .review-text {
             font-size: 16px;
-            line-height: 1.6;
+            line-height: 1.7;
             color: #1a3342;
-            margin: 6px 0 4px;
         }
 
         .review-date {
             font-size: 13px;
-            color: #7a96a8;
-            margin-top: 6px;
+            color: #6d8fa3;
+            margin-top: 8px;
         }
 
         .empty-reviews {
             text-align: center;
-            padding: 36px 10px;
-            color: #5f7d92;
-            font-size: 16px;
-            background: #f6f9fb;
-            border-radius: 22px;
-            border: 1.5px dashed #dae3ea;
+            padding: 40px 10px;
+            color: #4c738a;
+            font-size: 17px;
+            background: #f6fafd;
+            border-radius: 24px;
+            border: 1.5px dashed #d4e0e8;
         }
 
         .success-message {
             display: none;
-            background: #dce8f0;
-            color: #0a2a3a;
-            padding: 16px 22px;
-            border-radius: 16px;
-            margin-top: 20px;
+            background: #d4e7f0;
+            color: #0a2e40;
+            padding: 18px 24px;
+            border-radius: 18px;
+            margin-top: 22px;
             font-weight: 500;
             text-align: center;
-            border: 1px solid #b8cedb;
+            border: 1px solid #b0cbd9;
+        }
+
+        .error-message {
+            display: none;
+            background: #f0d4d4;
+            color: #5e1a1a;
+            padding: 18px 24px;
+            border-radius: 18px;
+            margin-top: 22px;
+            font-weight: 500;
+            text-align: center;
+            border: 1px solid #d4b0b0;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s ease-in-out infinite;
+            vertical-align: middle;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
         @media (max-width: 540px) {
@@ -287,19 +327,20 @@
                 padding: 28px 18px 24px;
             }
             .hotel-name {
-                font-size: 26px;
+                font-size: 28px;
+                letter-spacing: 2px;
             }
             .invite {
                 font-size: 16px;
-                padding: 14px 16px;
+                padding: 16px 18px;
             }
             .rating-option label {
-                font-size: 16px;
-                padding: 8px 0;
+                font-size: 17px;
+                padding: 10px 0;
             }
             .btn-submit {
-                font-size: 16px;
-                padding: 14px;
+                font-size: 17px;
+                padding: 15px;
             }
         }
     </style>
@@ -309,51 +350,44 @@
 <div class="container">
     <div class="header">
         <div class="hotel-name">
-            <span>Аляска</span> · отель
+            <span>Горизонт</span> · отель
         </div>
         <div class="hotel-sub">Roblox · 4500</div>
     </div>
 
     <div class="invite">
-        <strong>Вы покидаете отель «Аляска»?</strong><br />
+        <strong>Вы покидаете отель «Горизонт»?</strong><br />
         Поделитесь впечатлениями или предложите, что добавить.
         Каждое мнение делает проект лучше.
     </div>
 
-    <!-- ===== ФОРМА С ОТПРАВКОЙ НА EMAIL ===== -->
-    <form id="reviewForm"action="https://formsubmit.co/el/zugoke"method="POST">
-        <!-- Скрытые поля для FormSubmit -->
-        <input type="hidden" name="_subject" value="Новый отзыв об отеле Аляска" />
-        <input type="hidden" name="_captcha" value="false" />
-        <input type="hidden" name="_template" value="table" />
-        <input type="hidden" name="_autoresponse" value="Благодарим за отзыв об отеле Аляска! Ваше мнение важно для нас." />
-
+    <form id="reviewForm">
         <div class="form-group">
             <label for="playerName">Ваше имя в Roblox</label>
-            <input type="text" id="playerName" name="Имя" placeholder="Например: Alex_Builder" required />
+            <input type="text" id="playerName" placeholder="Например: Alex_Builder" required />
         </div>
 
         <div class="form-group">
             <label>Оценка</label>
             <div class="rating-group">
                 <div class="rating-option">
-                    <input type="radio" name="Оценка" id="r1" value="1" />
+                    <input type="radio" name="rating" id="r1" value="1" />
                     <label for="r1">1</label>
                 </div>
                 <div class="rating-option">
-                    <input type="radio" name="Оценка" id="r2" value="2" />
+                    <input type="radio" name="rating" id="r2" value="2" />
                     <label for="r2">2</label>
                 </div>
                 <div class="rating-option">
-                    <input type="radio" name="Оценка" id="r3" value="3" />
+                    <input type="radio" name="rating" id="r3" value="3" />
                     <label for="r3">3</label>
                 </div>
                 <div class="rating-option">
-                    <input type="radio" name="Оценка" id="r4" value="4" checked />
+                    <input type="radio" name="rating" id="r4" value="4" checked />
                     <label for="r4">4</label>
                 </div>
                 <div class="rating-option">
-                    <input type="radio" name="Оценка" id="r5" value="5" />
+                    <input type="radio" name="rating" id="r5" value="5" />
                     <label for="r5">5</label>
                 </div>
             </div>
@@ -361,47 +395,27 @@
 
         <div class="form-group">
             <label for="reviewText">Отзыв или предложение</label>
-            <textarea id="reviewText" name="Отзыв" placeholder="Что понравилось? Что можно улучшить? Какие комнаты или зоны добавить?" required></textarea>
+            <textarea id="reviewText" placeholder="Что понравилось? Что можно улучшить? Какие комнаты или зоны добавить?" required></textarea>
         </div>
 
-        <button type="submit" class="btn-submit">Отправить отзыв</button>
+        <button type="submit" class="btn-submit" id="submitBtn">Отправить отзыв</button>
     </form>
 
     <div id="successMessage" class="success-message">
-        Отзыв успешно отправлен! Спасибо.
+        Отзыв успешно сохранён! Спасибо.
     </div>
 
-    <!-- ===== БЛОК ОТЗЫВОВ (локальные) ===== -->
+    <div id="errorMessage" class="error-message">
+        Ошибка при сохранении. Попробуйте ещё раз.
+    </div>
+
     <div class="reviews-section">
         <div class="reviews-title">
-            Отзывы · <span id="reviewCount">3</span>
+            Отзывы · <span id="reviewCount">0</span>
         </div>
 
         <div id="reviewsList">
-            <div class="review-card">
-                <div class="review-header">
-                    <span class="review-author">Nordic_Cat</span>
-                    <span class="review-rating">5</span>
-                </div>
-                <div class="review-text">Идеальный лобби, очень уютно. Добавьте ещё камин и зону для посиделок у воды.</div>
-                <div class="review-date">2 дня назад</div>
-            </div>
-            <div class="review-card">
-                <div class="review-header">
-                    <span class="review-author">Frozen_Vibe</span>
-                    <span class="review-rating">4</span>
-                </div>
-                <div class="review-text">Красивые виды, но не хватает бассейна на крыше. Было бы огонь!</div>
-                <div class="review-date">5 дней назад</div>
-            </div>
-            <div class="review-card">
-                <div class="review-header">
-                    <span class="review-author">Snow_Rider</span>
-                    <span class="review-rating">5</span>
-                </div>
-                <div class="review-text">Лучший отель на 4500! Атмосфера северного сияния — топ.</div>
-                <div class="review-date">1 неделя назад</div>
-            </div>
+            <!-- Отзывы будут загружены из Firebase -->
         </div>
 
         <div id="emptyMessage" class="empty-reviews" style="display: none;">
@@ -411,105 +425,174 @@
 </div>
 
 <script>
-    (function() {
-        const STORAGE_KEY = 'alaska_hotel_reviews';
+    // ============================================================
+    // 1. НАСТРОЙКА FIREBASE — ТВОИ ДАННЫЕ
+    // ============================================================
+    const firebaseConfig = {
+        apiKey: "AIzaSyDAYN1_Bng0zCRlXgODks_1GQktnIxdXpM",
+        authDomain: "gorizont-5b04d.firebaseapp.com",
+        projectId: "gorizont-5b04d",
+        storageBucket: "gorizont-5b04d.firebasestorage.app",
+        messagingSenderId: "766100432763",
+        appId: "1:766100432763:web:46ab01bb602a27f8bcffde"
+    };
 
-        function getReviews() {
-            try {
-                const data = localStorage.getItem(STORAGE_KEY);
-                return data ? JSON.parse(data) : [];
-            } catch {
-                return [];
-            }
-        }
+    // Инициализация Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
 
-        function saveReviews(reviews) {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(reviews));
-        }
+    // ============================================================
+    // 2. РАБОТА С ОТЗЫВАМИ
+    // ============================================================
 
-        function addReview(name, rating, text) {
-            const reviews = getReviews();
-            const now = new Date();
-            const dateStr = now.toLocaleDateString('ru-RU', { 
-                day: 'numeric', month: 'long', year: 'numeric' 
-            });
-            reviews.unshift({
-                id: Date.now(),
-                name: name.trim(),
-                rating: parseInt(rating, 10),
-                text: text.trim(),
-                date: dateStr
-            });
-            saveReviews(reviews);
-            return reviews;
-        }
+    const reviewsCollection = db.collection('reviews');
 
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
+    // Загрузка отзывов
+    function loadReviews() {
+        const container = document.getElementById('reviewsList');
+        const empty = document.getElementById('emptyMessage');
+        const countSpan = document.getElementById('reviewCount');
 
-        function renderReviews() {
-            const container = document.getElementById('reviewsList');
-            const empty = document.getElementById('emptyMessage');
-            const countSpan = document.getElementById('reviewCount');
+        reviewsCollection
+            .orderBy('createdAt', 'desc')
+            .get()
+            .then((snapshot) => {
+                if (snapshot.empty) {
+                    container.innerHTML = '';
+                    empty.style.display = 'block';
+                    countSpan.textContent = '0';
+                    return;
+                }
 
-            const reviews = getReviews();
-            countSpan.textContent = reviews.length;
+                empty.style.display = 'none';
+                let html = '';
+                let count = 0;
 
-            if (reviews.length === 0) {
-                container.innerHTML = '';
-                empty.style.display = 'block';
-                return;
-            }
-
-            empty.style.display = 'none';
-
-            let html = '';
-            reviews.forEach(r => {
-                html += `
-                    <div class="review-card">
-                        <div class="review-header">
-                            <span class="review-author">${escapeHtml(r.name)}</span>
-                            <span class="review-rating">${r.rating}</span>
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    count++;
+                    html += `
+                        <div class="review-card">
+                            <div class="review-header">
+                                <span class="review-author">${escapeHtml(data.name)}</span>
+                                <span class="review-rating">${data.rating}</span>
+                            </div>
+                            <div class="review-text">${escapeHtml(data.text)}</div>
+                            <div class="review-date">${escapeHtml(data.date)}</div>
                         </div>
-                        <div class="review-text">${escapeHtml(r.text)}</div>
-                        <div class="review-date">${escapeHtml(r.date)}</div>
-                    </div>
-                `;
+                    `;
+                });
+
+                container.innerHTML = html;
+                countSpan.textContent = count;
+            })
+            .catch((error) => {
+                console.error('Ошибка загрузки:', error);
+                showError('Не удалось загрузить отзывы. Проверьте подключение к интернету.');
             });
-            container.innerHTML = html;
-        }
+    }
 
-        // === Обработка формы (перехват для локального сохранения) ===
-        const form = document.getElementById('reviewForm');
-
-        form.addEventListener('submit', function(e) {
-            // Сохраняем отзыв локально ДО отправки на email
-            const nameInput = document.getElementById('playerName');
-            const ratingInput = document.querySelector('input[name="Оценка"]:checked');
-            const textInput = document.getElementById('reviewText');
-
-            const name = nameInput.value.trim();
-            const rating = ratingInput ? ratingInput.value : '4';
-            const text = textInput.value.trim();
-
-            if (name && text) {
-                addReview(name, rating, text);
-                renderReviews();
-            }
-
-            // Показываем сообщение об успехе (но форма всё равно уйдёт на email)
-            const success = document.getElementById('successMessage');
-            success.style.display = 'block';
-            setTimeout(() => {
-                success.style.display = 'none';
-            }, 5000);
+    // Добавление отзыва
+    function addReview(name, rating, text) {
+        const now = new Date();
+        const dateStr = now.toLocaleDateString('ru-RU', { 
+            day: 'numeric', 
+            month: 'long', 
+            year: 'numeric' 
         });
 
-        renderReviews();
-    })();
+        return reviewsCollection.add({
+            name: name.trim(),
+            rating: parseInt(rating, 10),
+            text: text.trim(),
+            date: dateStr,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+    }
+
+    // ============================================================
+    // 3. ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+    // ============================================================
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    function showSuccess() {
+        const el = document.getElementById('successMessage');
+        el.style.display = 'block';
+        setTimeout(() => { el.style.display = 'none'; }, 5000);
+    }
+
+    function showError(msg) {
+        const el = document.getElementById('errorMessage');
+        el.textContent = msg || 'Ошибка при сохранении. Попробуйте ещё раз.';
+        el.style.display = 'block';
+        setTimeout(() => { el.style.display = 'none'; }, 5000);
+    }
+
+    function setLoading(isLoading) {
+        const btn = document.getElementById('submitBtn');
+        if (isLoading) {
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading-spinner"></span> Отправка...';
+        } else {
+            btn.disabled = false;
+            btn.innerHTML = 'Отправить отзыв';
+        }
+    }
+
+    // ============================================================
+    // 4. ОБРАБОТКА ФОРМЫ
+    // ============================================================
+
+    const form = document.getElementById('reviewForm');
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const nameInput = document.getElementById('playerName');
+        const ratingInput = document.querySelector('input[name="rating"]:checked');
+        const textInput = document.getElementById('reviewText');
+
+        const name = nameInput.value.trim();
+        const rating = ratingInput ? ratingInput.value : '4';
+        const text = textInput.value.trim();
+
+        if (!name || !text) {
+            showError('Пожалуйста, заполните имя и текст отзыва.');
+            return;
+        }
+
+        setLoading(true);
+
+        addReview(name, rating, text)
+            .then(() => {
+                // Очищаем форму
+                nameInput.value = '';
+                textInput.value = '';
+                const defaultRating = document.getElementById('r4');
+                if (defaultRating) defaultRating.checked = true;
+
+                showSuccess();
+                loadReviews(); // Перезагружаем список
+            })
+            .catch((error) => {
+                console.error('Ошибка:', error);
+                showError('Не удалось сохранить отзыв. Проверьте подключение к интернету.');
+            })
+            .finally(() => {
+                setLoading(false);
+            });
+    });
+
+    // ============================================================
+    // 5. ЗАГРУЗКА ПРИ СТАРТЕ
+    // ============================================================
+
+    loadReviews();
 </script>
 
 </body>
